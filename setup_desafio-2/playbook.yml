@@ -111,3 +111,26 @@
 
         EOF
 
+#################################################
+# Challenge part 2 - app env setup on behalf of
+# {{ create_user }}.
+#################################################
+
+- hosts: all
+  vars_files:
+    - vars/default.yml
+  remote_user: "{{ create_user }}"
+
+# Clone the project in the home of the user created above
+  tasks:
+    - name: Preparing environment of {{ create_user }}
+# Setting up credentials for first deploy on localhost
+      openssh_keypair:
+        path: ~/.ssh/id_rsa
+        size: 2048
+
+    - name: Authorized local ssh for first deploy.
+      shell: >-
+        /bin/cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys;
+        ssh-keyscan -H localhost > ~/.ssh/known_hosts
+
