@@ -173,3 +173,11 @@
         . /home/{{ create_user }}/.bashrc; \
         . /home/{{ create_user }}/.nvmenv; \
         nvm install
+
+# Cloning repository of application
+    - name: Clone git repository desafio-2
+      git:
+        repo: https://github.com/alessandro11/desafio-2.git
+        dest: /home/{{ create_user }}/desafio-2
+        version: "{{ release_version }}"
+
