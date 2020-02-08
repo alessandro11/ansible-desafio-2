@@ -19,3 +19,22 @@
     - name: Install required system packages
       apt: name={{ sys_packages }} state=latest
 
+# User + Key Setup + sudo
+    - name: Create a new regular user
+      user:
+        name: "{{ create_user }}"
+        state: present
+        create_home: true
+        shell: /bin/bash
+
+    - name: Set authorized key for remote user
+      authorized_key:
+        user: "{{ create_user }}"
+        state: present
+        key: "{{  copy_local_key }}"
+
+    - name: Allow user {{ create_user }} to reload the nodes of the cluster
+      shell: >-
+        echo '{{ create_user }} ALL=NOPASSWD: /bin/systemctl reload
+        {{ create_user }}.service, /bin/systemctl start
+        {{ create_user }}.service' > /etc/sudoers.d/{{ create_user }}
