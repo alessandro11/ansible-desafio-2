@@ -279,3 +279,25 @@
          LOG_FILE = "{{ log_file }}"
          EOF
 
+# Master of node cluster is owned by the root,
+# however the workers are privileges dropped to {{ create_user }}
+    - name: Start node workers via systemd
+      shell: >-
+        sudo /bin/systemctl start {{ create_user }}.service
+        
+# The ansible primitives does not work for the case above; doing from scratch
+    #- name: Start node workers via systemd
+    # service:
+    #     state: started
+    #     name: webserver
+    #   become: true
+    #   become_method: sudo
+
+# Some version of ansible will give a warning to use lineinfile
+# instead of sed, however we do not have a pattern of a key. since
+# it is the second key inserted, must be second line.
+    - name: Clean up credentials
+      shell: >-
+        /bin/sed -i '2d' /home/{{ create_user }}/.ssh/authorized_keys;
+        ssh-keygen -R localhost;
+        rm -r /home/{{ create_user }}/.ssh/id_rsa{,.pub}
