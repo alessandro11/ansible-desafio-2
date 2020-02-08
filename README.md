@@ -28,25 +28,26 @@ To run this playbook execute:
 ansible-playbook playbook.yml -l <server>
 ```
 
-on this repository there is a short file describing mine mini
+on this repository there is a short file (hosts) describing mine mini
 infrastructure, nevertheless in case needs to be adjusted the inventory,
-please adjust. (Remind -i <inventory_file>).
+please adjust. (for sure there is a global inventory :) and the
+command above should be enough).
 
 # Results
 
 At the end of the command above you should have a fully setup node
 application, with the following futures:
 
---* All the system packages required.
---* An non privilege user in the system running the application.
---* Credentials (pub key) to access and make easier deploy.
---* The service start resilient using the native systemd.
---* Nginx http/https service running, see notes for https.¹
---* Script running each minute checking the health of the node app.
---* Script running every midnight sending email about the routes access and frequencies.
---* Script to generate a workload in the server.
---* An easy switch of the versions among NodeJS via virtual env (NVM).
---* Easy and safe deploy and rollback of the application, see notes.²
+* All the system packages required.
+* An non privilege user in the system running the application.
+* Credentials (pub key) to access and make easier deploy.
+* The service start resilient using the native systemd.
+* Nginx http/https service running, see notes for https.¹
+* Script running each minute checking the health of the node app.
+* Script running every midnight sending email about the routes access and frequencies.
+* Script to generate a workload in the server.
+* An easy switch of the versions among NodeJS via virtual env (NVM).
+* Easy and safe deploy and rollback of the application, see notes.²
 
 ¹ Nginx has been setup with https, however an certificate needs to be
 generate according to the domain. The challenge says to setup and not
@@ -56,8 +57,9 @@ with acme challenge to generate the certificate by Let's Encrypt.
 ² The *deploy* and *rollback* has been build with shipit. So a
 [shipitfile](https://github.com/alessandro11/desafio-2/blob/master/shipitfile.js)
 must be setup, change the value of the following variables:
-ps.: in case no changes has been made to create_user ansible variable
-do not change deployTo, THIS PATH SHOULD NOT POINT TO THE REPOSITORY DIR.
+ps.: in case no changes has been made to create_user (Ansible variable)
+do not change deployTo, THIS PATH MUST BE POINT TO THE ROOT OF THE
+HOME OF THE USER HOLDING THE APPLICATION.
 
 ```
 deployTo: <path to deploy>
@@ -71,8 +73,12 @@ change the webserver home where has been deployed
 /home/{{ create_user }}/.nvm/nvm-exec npm install
 ```
 
-*To run deploy:* ```npx shipit production deploy``` from the repository dir.
-*To rollback:* ```npx shipit master rollback``` from the repository dir.
+*To run deploy:* ```npx shipit production deploy``` from the
+ repository dir.
+ 
+*To rollback:* ```npx shipit master rollback``` from the repository
+ dir.
+ 
 
 The deploy creates a directory on ```~/releases/20200208160632```
 where the deploys are, and a symbolic link current point to some time
