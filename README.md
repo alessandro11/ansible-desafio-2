@@ -85,7 +85,7 @@ change the webserver home where it has been deployed
 *To run deploy:* ```npx shipit production deploy``` from the
  repository dir.
  
-*To rollback:* ```npx shipit master rollback``` from the repository
+*To rollback:* ```npx shipit production rollback``` from the repository
  dir.
  
 
