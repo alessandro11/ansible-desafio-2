@@ -4,7 +4,7 @@ This is an Ansible playbook to deploy the challenge part two from
 Linx Impulse. This tool has been chosen due to the fact that the Cloud
 Engineering position claims knowledge about this tool.
 
-
+<pre>
 .
 ├── setup_desafio-2
 │   └── vars
@@ -16,5 +16,4 @@ Engineering position claims knowledge about this tool.
 ├── proxy.conf    - snippet for nginx, headers for reverse proxy.
 ├── webserver     - default variables such as NODE_ENV; used for some scripts.
 ├── webserver.com - setup file for nginx virtual host.
-
-
+</pre>
