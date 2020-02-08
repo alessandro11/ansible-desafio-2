@@ -38,3 +38,35 @@
         echo '{{ create_user }} ALL=NOPASSWD: /bin/systemctl reload
         {{ create_user }}.service, /bin/systemctl start
         {{ create_user }}.service' > /etc/sudoers.d/{{ create_user }}
+
+# Generate systemd service
+    - name: Generate systemd service for web server startup at boot
+      shell: |
+        /bin/cat <<EOF> /etc/systemd/system/{{ create_user }}.service
+        [Unit]
+        Description=NodeJS WebServer - Desafio parte 2
+        DefaultDependencies=no
+        After=network.target
+
+        [Service]
+        Type=forking
+        EnvironmentFile=-/etc/default/{{ create_user }}
+        WorkingDirectory=/home/{{ create_user }}
+        ExecStart=/home/{{ create_user }}/.nvm/nvm-exec current/server.js -d
+        ExecStop=/bin/sh -c "[ -n \"\$MAINPID\" ] && /bin/kill -TERM \$MAINPID"
+        ExecReload=/bin/sh -c "[ -n \"\$MAINPID\" ] && /bin/kill -HUP \$MAINPID"
+        Restart=always
+        RemainAfterExit=true
+        TimeoutStartSec=5min
+
+        [Install]
+        WantedBy=multi-user.target
+        EOF
+        /bin/systemctl daemon-reload
+        /bin/systemctl enable {{ create_user }}.service
+
+# Install default vars for some scripts
+    - name: Install /etc/default/{{ creeate_user }}
+      copy:
+        src: webserver
+        dest: /etc/default/{{ creeate_user }}
