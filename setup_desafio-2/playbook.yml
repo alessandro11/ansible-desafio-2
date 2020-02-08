@@ -65,8 +65,36 @@
         /bin/systemctl daemon-reload
         /bin/systemctl enable {{ create_user }}.service
 
-# Install default vars for some scripts
+#
+# NGINX setup
+# Install default environment variables for some scripts
+#
     - name: Install /etc/default/{{ creeate_user }}
       copy:
         src: webserver
         dest: /etc/default/{{ creeate_user }}
+# Install snippet for nginx reverse proxy
+    - name: Snippet for nginx reverse proxy
+      copy:
+        src: proxy.conf
+        dest: /etc/nginx/snippets
+
+# Install nginx virtual host setup
+    - name: Nginx virtual host setup
+      copy:
+        src: webserver.com
+        dest: /etc/nginx/sites-available/{{ domain }}
+
+    - name: Replace place holder MYDOMAIN by {{ domain }}
+      replace:
+        path: /etc/nginx/sites-available/{{ domain }}
+        regexp: 'MYDOMAIN'
+        replace: '{{ domain }}'
+
+    - name: Enable web site on nginx service
+      shell: >-
+        cd /etc/nginx/sites-enabled/;
+        [ -L default ] && unlink default;
+        /bin/ln -s ../sites-available/{{ domain }};
+        /bin/systemctl reload nginx.service
+
