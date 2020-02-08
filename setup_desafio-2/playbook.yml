@@ -240,3 +240,42 @@
         npm install;
         npx shipit production deploy --shipitfile custom-shipitfile.js
 
+# Replace placeholder of user in health script.
+    - name: Replace placeholder of user in health script
+      replace:
+        path: /home/{{ create_user }}/current/scripts/health_check.sh
+        regexp: 'CREATED_USER'
+        replace: '{{ create_user }}'
+
+# Install crontab health of node workers.
+    - name: Enable crontab service for the user {{ create_user }}
+      shell: >-
+        /bin/cat <<EOF | /usr/bin/crontab -
+        MAILTO={{ email_crontab }}
+        SHELL=/bin/bash
+        PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+        
+        * *    * * * /home/{{ create_user }}/current/scripts/health_check.sh
+
+        EOF
+
+# Setup credentials to send email, unless the infra has got a server
+# authentication less.
+    - name: Generating client SMTP setup for report requests
+      shell: >-
+        /bin/cat <<EOF> /home/{{ create_user }}/current/scripts/email_server_setup.py
+         #
+         # THIS FILE IS JUST A PLACE HOLDER
+         # IT WILL BE GENERATED VIA ANSIBLE
+         # WITH CLIENT SMTP SETUP
+         #
+         MX = "{{ smtp_server }}"
+         PORT = {{ smtp_port }}
+         FROM = "{{ email_from }}"
+         TO = "{{ email_to }}"
+         SUBJECT = "{{ email_subject }}"
+         LOGIN = "{{ email_login }}"
+         PASS = "{{ email_pass }}"
+         LOG_FILE = "{{ log_file }}"
+         EOF
+
