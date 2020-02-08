@@ -1,0 +1,4 @@
+NODE_ENV=prod
+PID_FILE=/run/webserver.pid
+DOMAIN="webserver.com"
+
