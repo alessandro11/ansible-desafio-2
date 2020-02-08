@@ -1,0 +1,20 @@
+##########################
+# Inventory
+##########################
+
+[servers]
+server1 ansible_host=192.168.1.1
+server2 ansible_host=192.168.1.2
+
+[webservers]
+webserver.com
+
+##########################################################################
+# Makes sure we use Python 3 (/usr/bin/python3) on remote hosts.
+# [servers:vars] sets global values for all nodes in the "servers" group.
+# This is necessary because by default Ansible will try to use
+# /usr/bin/python, which is not available on newer Ubuntu versions.
+#########################################################################
+[servers:vars]
+ansible_python_interpreter=/usr/bin/python3
+
