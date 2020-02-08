@@ -84,6 +84,8 @@ The deploy creates a directory on ```~/releases/20200208160632```
 where the deploys are, and a symbolic link current point to some time
 stamp dir on releases.
 
+# Structure of this repository
+
 <pre>
 .
 ├── setup_desafio-2
