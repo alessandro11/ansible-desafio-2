@@ -181,3 +181,62 @@
         dest: /home/{{ create_user }}/desafio-2
         version: "{{ release_version }}"
 
+#
+# Shipit has been used for deploy, generate a custom file
+# to deploy from localhost.
+#
+# WARNING:
+#    The repository has got a shipitfile.js
+# if the variable create_user has been changed
+# YOU MUST CHANGE ON THIS FILE OT BE ABLE TO DEPLOY
+# AND ROLLBACK.
+
+    - name: Generate a custom shipitfile
+      shell: >-
+        /bin/cat <<EOF> /home/{{ create_user }}/desafio-2/custom-shipitfile.js
+          module.exports = shipit => {
+            require('shipit-deploy')(shipit)
+
+            shipit.initConfig({
+              default: {
+              deployTo: '/home/{{ create_user }}',
+              repositoryUrl: 'https://github.com/alessandro11/desafio-2.git',
+              keepReleases: 10,
+              keepWorkspace: false, // should we remove workspace dir after deploy?
+              deleteOnRollback: false,
+              //key: '~/.ssh/id_ecdsa',
+              tag: '{{ release_version }}',
+              //banch: <branch name>
+              deploy: {
+                remoteCopy: {
+                     copyAsDir: false, // Should we copy as the dir (true) or the content of the dir (false)
+              },
+            },
+          },
+          production: {
+             servers: '{{ create_user }}@localhost',
+          },
+          });
+
+          shipit.blTask('install_dep', async () => {
+             await shipit.remote('cd current; \
+                 /home/{{ create_user }}/.nvm/nvm-exec npm install; \
+                 sudo /bin/systemctl reload {{ create_user }}.service')
+             .then(({ stdout }) => console.log(stdout))
+             .catch(({ stderr }) => console.error(stderr));
+          })
+
+          shipit.on('deployed', function() {
+             shipit.start('install_dep');
+          });
+         }
+
+# the custom shipitfile must be on the dir as node_modules
+    - name: Installing app dependencies; also first deploy
+      shell: >-
+        . /home/{{ create_user }}/.bashrc; \
+        . /home/{{ create_user }}/.nvmenv; \
+        cd ~/desafio-2; \
+        npm install;
+        npx shipit production deploy --shipitfile custom-shipitfile.js
+
