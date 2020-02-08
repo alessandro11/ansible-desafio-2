@@ -98,3 +98,16 @@
         /bin/ln -s ../sites-available/{{ domain }};
         /bin/systemctl reload nginx.service
 
+# Install crontab for log parser
+    - name: Enable crontab service to parse the log script
+      shell: >-
+        /bin/cat <<EOF | /usr/bin/crontab -
+        MAILTO={{ email_crontab }}
+        SHELL=/bin/bash
+        PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+        # run at 00:00 every day
+        0 0    * * * /home/{{ create_user }}/current/scripts/log_parser.py
+
+        EOF
+
