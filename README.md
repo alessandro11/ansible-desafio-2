@@ -31,18 +31,21 @@ ansible-playbook playbook.yml -l <server>
 on this repository there is a short file (hosts) describing mine mini
 infrastructure, nevertheless in case needs to be adjusted the inventory,
 please adjust. (for sure there is a global inventory :) and the
-command above should be enough).
+command above should be enough). The plays on behalf of each user are in the playbook.
 
 # Results
 
-At the end of the command above you should have a fully setup node
+At the end of the above command you should have a fully setup NodeJS
 application, with the following futures:
 
 * All the system packages required.
 * An non privilege user in the system running the application.
 * Credentials (pub key) to access and make easier deploy.
-* The service start resilient using the native systemd.
+* The resilient service using the native systemd.
 * Nginx http/https service running, see notes for https.¹
+  * Reverse proxy
+  * One Node worker per CPU.
+  * Load balancing via nginx using round-robin policy.
 * Script running each minute checking the health of the node app.
 * Script running every midnight sending email about the routes access and frequencies.
 * Script to generate a workload in the server.
@@ -51,12 +54,18 @@ application, with the following futures:
 
 ¹ Nginx has been setup with https, however an certificate needs to be
 generate according to the domain. The challenge says to setup and not
-generate mechanism to generate it. However, it is easy using certboot
-with acme challenge to generate the certificate by Let's Encrypt.
+generate mechanism to obtain it. However, it is easy using certboot
+with acme challenge to generate the certificate by Let's
+Encrypt.
+
+About load balance: still the load balancing has been released via nginx. However, there
+is a Master worker running, which also could do the job, so if
+the reverse proxy points only to port 3000 (Master worker), this
+will do load balance.
 
 ² The *deploy* and *rollback* has been build with shipit. So a
 [shipitfile](https://github.com/alessandro11/desafio-2/blob/master/shipitfile.js)
-must be setup, change the value of the following variables:
+must be setup, change the values of the following variables:
 ps.: in case no changes has been made to create_user (Ansible variable)
 do not change deployTo, THIS PATH MUST BE POINT TO THE ROOT OF THE
 HOME OF THE USER HOLDING THE APPLICATION.
@@ -69,7 +78,7 @@ banch: <name>
 
 servers: 'server@my_server_domain.com'
 
-change the webserver home where has been deployed
+change the webserver home where it has been deployed
 /home/{{ create_user }}/.nvm/nvm-exec npm install
 ```
 
