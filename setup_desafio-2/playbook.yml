@@ -134,3 +134,42 @@
         /bin/cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys;
         ssh-keyscan -H localhost > ~/.ssh/known_hosts
 
+# Preparing nvm environment
+    - name: Installing Node Version Manager (nvm)
+      git:
+        repo: https://github.com/nvm-sh/nvm.git
+        dest: /home/{{ create_user }}/.nvm
+
+    - name: Preparing node environment to lock for LTS
+      copy:
+        src: nvmrc
+        dest: /home/{{ create_user }}/.nvmrc
+        owner: "{{ create_user }}"
+        group: "{{ create_user }}"
+        mode: '0644'
+
+    - name: Preparing node environment to be loaded at login
+      copy:
+        src: nvmenv
+        dest: /home/{{ create_user }}/.nvmenv
+        owner: "{{ create_user }}"
+        group: "{{ create_user }}"
+        mode: '0644'
+
+    - name: Load lode environment at login for {{ create_user }}
+      lineinfile:
+        path: /home/{{ create_user }}/.bashrc
+        line: . .nvmenv
+
+#
+# To use nvm install, the env must be loaded. However,
+# .nvmenv needs some vars that are exported by .bashrc, when
+# still .bashrc supposed to be loaded already; so, the
+# effective nvm environment will be loaded from the second
+# load of .nvmenv.
+#
+    - name: Install node version; it has been locked for lts/erbium
+      shell: >-
+        . /home/{{ create_user }}/.bashrc; \
+        . /home/{{ create_user }}/.nvmenv; \
+        nvm install
