@@ -69,10 +69,10 @@
 # NGINX setup
 # Install default environment variables for some scripts
 #
-    - name: Install /etc/default/{{ creeate_user }}
+    - name: Install /etc/default/{{ create_user }}
       copy:
         src: webserver
-        dest: /etc/default/{{ creeate_user }}
+        dest: /etc/default/{{ create_user }}
 # Install snippet for nginx reverse proxy
     - name: Snippet for nginx reverse proxy
       copy:
@@ -100,15 +100,14 @@
 
 # Install crontab for log parser
     - name: Enable crontab service to parse the log script
-      shell: >-
+      shell: |        
         /bin/cat <<EOF | /usr/bin/crontab -
         MAILTO={{ email_crontab }}
         SHELL=/bin/bash
         PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-        # run at 00:00 every day
+        # run at midnight every day
         0 0    * * * /home/{{ create_user }}/current/scripts/log_parser.py
-
         EOF
 
 #################################################
@@ -174,6 +173,14 @@
         . /home/{{ create_user }}/.nvmenv; \
         nvm install
 
+# Check any previous version of repo. has been installed
+    - name: Checking any previous version of the node app
+      shell: >-
+        if [ -d /home/{{ create_user }}/desafio-2 ]; then \
+           d="$(/bin/date +'%FT%T')"
+           mv /home/{{ create_user }}/desafio-2 /home/{{ create_user }}/desafio-2-${d}
+        fi
+        
 # Cloning repository of application
     - name: Clone git repository desafio-2
       git:
@@ -249,20 +256,20 @@
 
 # Install crontab health of node workers.
     - name: Enable crontab service for the user {{ create_user }}
-      shell: >-
+      shell: |
         /bin/cat <<EOF | /usr/bin/crontab -
         MAILTO={{ email_crontab }}
         SHELL=/bin/bash
         PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-        
+
+        # run on every minute
         * *    * * * /home/{{ create_user }}/current/scripts/health_check.sh
-
+        
         EOF
-
-# Setup credentials to send email, unless the infra has got a server
-# authentication less.
+        
+# Setup credentials to send email.
     - name: Generating client SMTP setup for report requests
-      shell: >-
+      shell: |        
         /bin/cat <<EOF> /home/{{ create_user }}/current/scripts/email_server_setup.py
          #
          # THIS FILE IS JUST A PLACE HOLDER
@@ -300,4 +307,5 @@
       shell: >-
         /bin/sed -i '2d' /home/{{ create_user }}/.ssh/authorized_keys;
         ssh-keygen -R localhost;
-        rm -r /home/{{ create_user }}/.ssh/id_rsa{,.pub}
+        rm -rf /home/{{ create_user }}/.ssh/id_rsa{.pub,};
+        rm -rf /home/{{ create_user }}/desafio-2/custom-shipitfile.js
