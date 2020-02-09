@@ -63,6 +63,8 @@ is a Master worker running, which also could do the job, so if
 the reverse proxy points only to port 3000 (Master worker), this
 will do load balance.
 
+# Deploy and Rollback
+
 ² The *deploy* and *rollback* has been build with shipit. So a
 [shipitfile](https://github.com/alessandro11/desafio-2/blob/master/shipitfile.js)
 must be setup, change the values of the following variables:
@@ -82,6 +84,8 @@ change the webserver home where it has been deployed
 /home/{{ create_user }}/.nvm/nvm-exec npm install
 ```
 
+The repository been deployed must be in the remote.
+
 *To run deploy:* ```npx shipit production deploy``` from the
  repository dir.
  
@@ -99,12 +103,14 @@ stamp dir on releases.
 .
 ├── setup_desafio-2
 │   └── vars
-├────── └── default.yml - default variables used by Ansible.
-│
-├── nvmenv        - file with snippet to load the environment of nvm/node.
-├── nvmrc         - file with the version to be used. It has been locked for LTS.
-├── playbook.yml  - main file with all those plays to deploy completely the challenge two.
-├── proxy.conf    - snippet for nginx, headers for reverse proxy.
-├── webserver     - default variables such as NODE_ENV; used for some scripts.
-├── webserver.com - setup file for nginx virtual host.
+├──     └── default.yml - Default variables used by Ansible.
+├──     nvmenv        - File with snippet to load the environment of nvm/node.
+├──     nvmrc         - File with the version to be used. It has been locked for LTS.
+├──     playbook.yml  - Main file with all those plays to deploy completely the challenge two.
+├──     proxy.conf    - snippet for nginx, headers for reverse proxy.
+├──     webserver     - default variables such as NODE_ENV; used for some scripts.
+├──     webserver.com - setup file for nginx virtual host.
+├── LICENCE   - The licence of this repo.
+├── README.md - This readme
+└── hosts     - Small Ansible inventory
 </pre>
