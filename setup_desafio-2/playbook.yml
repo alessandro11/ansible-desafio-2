@@ -307,5 +307,6 @@
       shell: >-
         /bin/sed -i '2d' /home/{{ create_user }}/.ssh/authorized_keys;
         ssh-keygen -R localhost;
-        rm -rf /home/{{ create_user }}/.ssh/id_rsa{.pub,};
-        rm -rf /home/{{ create_user }}/desafio-2/custom-shipitfile.js
+        rm -r /home/{{ create_user }}/.ssh/id_rsa;
+        rm -r /home/{{ create_user }}/.ssh/id_rsa.pub;
+        rm -r /home/{{ create_user }}/desafio-2/custom-shipitfile.js
