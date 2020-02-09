@@ -3,7 +3,7 @@ create_user: webserver
 copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ecdsa.pub') }}"
 sys_packages: [ 'curl', 'vim', 'git', 'nginx', 'rsync' ]
 domain: webserver.com
-release_version: rc-0.0.3
+release_version: rc-0.0.4
 
 #
 # Unless the infrastructure has got some email services
